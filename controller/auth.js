@@ -1,5 +1,5 @@
 const User = require('../models/User'); // Importer le modèle User
-const bcrypt = require('bcrypt'); // Pour le hashage des mots de passe
+const bcrypt = require('bcryptjs'); // Pour le hashage des mots de passe
 const jwt = require('jsonwebtoken'); // Pour générer les tokens
 
 // Fonction pour enregistrer un nouvel utilisateur
