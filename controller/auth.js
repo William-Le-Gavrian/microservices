@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken'); // Pour générer les tokens
 // Fonction pour enregistrer un nouvel utilisateur
 const register = async (req, res) => {
   try {
+    
     const { firstname, lastname, email, password } = req.body;
 
     // Vérifier que les champs requis sont fournis
