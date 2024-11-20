@@ -43,10 +43,19 @@ const getAllBooks = async (req, res) => {
     res.status(500).json({ message: 'Erreur serveur', error: error.message });
   }
 };
+const getBookById = async (req, res) => {
+  try {
+    const { id } = req.params; // Récupérer l'id depuis les paramètres de la requête
+    const book = await Book.findOne({ id }); // Rechercher le livre par son ID
 
-// Exporter les fonctions
-module.exports = {
-  createBook,
-  getAllBooks,
+    if (!book) {
+      return res.status(404).json({ message: 'Livre non trouvé' });
+    }
+
+    res.status(200).json({ name: book.name }); // Retourner uniquement le nom du livre
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur serveur', error: error.message });
+  }
 };
 
+module.exports = { getAllBooks, createBook, getBookById };
