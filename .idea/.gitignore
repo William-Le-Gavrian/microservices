@@ -7,6 +7,6 @@
 /dataSources/
 /dataSources.local.xml
 
-../user-service/node_modules/
-../user-service/src/.env
+**/node_modules/
+**/.env
 
