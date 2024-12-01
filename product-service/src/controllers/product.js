@@ -1,6 +1,7 @@
 const ProductModel = require("../models/Product");
 const {verifyProduct} = require("../validator/product");
 
+
 module.exports = {
     createProduct: async (req, res) => {
         try {
