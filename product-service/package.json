@@ -1,5 +1,5 @@
 {
-  "name": "user",
+  "name": "product-service",
   "version": "1.0.0",
   "description": "",
   "main": "src/app.js",
@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "jsonschema": "^1.4.1",
     "mongoose": "^8.8.3"
