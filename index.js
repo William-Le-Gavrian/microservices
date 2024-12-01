@@ -1,6 +1,6 @@
 const express = require('express');
 const connectDB = require('./config/configdb'); // Connexion à MongoDB
-const bookRouter = require('./router/book'); // Routeur pour les livres
+
 const authRouter = require('./router/auth'); // Routeur pour l'authentification
 
 const app = express(); // Créer une instance d'application Express
@@ -13,10 +13,9 @@ connectDB();
 app.use(express.json());
 
 // Routes pour les livres
-app.use('/books', bookRouter);
 
 // Routes pour l'authentification
-app.use('/auth', authRouter);
+app.use('/api/auth', authRouter);
 
 // Démarrer le serveur
 app.listen(port, () => {
