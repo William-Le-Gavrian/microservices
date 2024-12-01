@@ -18,7 +18,8 @@ module.exports = {
                 category: {
                     type: 'string',
                     trim: true,
-                    errorMessage: 'Category is required',
+                    enum: ['food', 'clothing', 'book', 'electronics', 'household'],
+                    errorMessage: 'Category is required and must be either food, clothing, book, electronics or household',
                 },
                 stock: {
                     type: 'number',
