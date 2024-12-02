@@ -4,7 +4,7 @@ const axios = require('axios');
 module.exports = {
     createCart: async (req, res) => {
         try {
-            // const userId = req.user.id;
+            // const userId = req.user;
             const cart = await CartModel.findOneAndUpdate(
                 // { userId },
                 { items: [] }, // Création d'un panier vide
