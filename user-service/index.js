@@ -1,7 +1,7 @@
 const express = require('express');
 const connectDB = require('./config/configdb'); // Connexion à MongoDB
 
-const authRouter = require('./router/auth'); // Routeur pour l'authentification
+const authRouter = require('./src/routes/auth'); // Routeur pour l'authentification
 
 const app = express(); // Créer une instance d'application Express
 const port = 5000; // Définir le port d'écoute
