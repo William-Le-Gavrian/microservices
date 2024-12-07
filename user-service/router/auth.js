@@ -1,19 +1,15 @@
-const express = require('express');
-const router = express.Router();
-const { register, login, updateUserDetails, getUserDetails,changePassword } = require('../controller/auth'); // Importer les contrôleurs
+const router = require('express').Router();
+const authController = require('../controllers/auth');
 
- // Importer le contrôleur
- const authMiddleware = require('../midlleware/jws');
+const { verifyToken } = require('../middleware/jwt');
 
 // Route POST /auth/register - Inscription
-router.post('/register', register);
+router.post('/register', authController.register);
 
 // Route POST /auth/login - Connexion
-router.post('/login', login);
-router.put('/users/me', authMiddleware, updateUserDetails);
-router.get('/users/me', authMiddleware, getUserDetails);
-router.patch('/users/me/password', authMiddleware, changePassword);
-
+router.post('/login', authController.login);
+router.put('/users/me', verifyToken, authController.updateUserDetails);
+router.get('/users/me', verifyToken, authController.getUserDetails);
+router.patch('/users/me/password', verifyToken, authController.changePassword);
 
 module.exports = router; // Exporter correctement le routeur
-
