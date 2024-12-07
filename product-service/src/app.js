@@ -21,7 +21,7 @@ mongoose
     });
 
 app.get('/', (req, res) => {
-    res.send('Hello world');
+    res.send('Bonjour voici le catalogue des produits');
 });
 
 app.use('/api/products', apiRouter);

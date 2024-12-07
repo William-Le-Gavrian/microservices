@@ -21,7 +21,7 @@ mongoose
     });
 
 app.get('/', (req, res) => {
-    res.send('Hello world');
+    res.send('Bonjour nous sommes dans le panier');
 });
 
 app.use('/api/cart', apiRouter);
