@@ -1,9 +1,10 @@
-const router = require("express").Router();
-const cartController = require("../controllers/cart");
+const router = require('express').Router();
+const cartController = require('../controllers/cart');
+const { verifyToken } = require('../middleware/jwt');
 
-router.post("/", cartController.createCart);
-router.get("/", cartController.getCart);
-router.post("/:productId", cartController.addItemToCart);
-router.delete("/:productId", cartController.removeItemFromCart);
+// router.post("/", verifyToken, cartController.createCart);
+router.get('/', verifyToken, cartController.getCart);
+router.post('/:productId', verifyToken, cartController.addItemToCart);
+router.delete('/:productId', verifyToken, cartController.removeItemFromCart);
 
 module.exports = router;

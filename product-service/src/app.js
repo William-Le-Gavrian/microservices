@@ -20,10 +20,6 @@ mongoose
         console.error('Unable to connect database: ', error);
     });
 
-app.get('/', (req, res) => {
-    res.send('Bonjour voici le catalogue des produits');
-});
-
 app.use('/api/products', apiRouter);
 
 app.listen(3001, () => {
