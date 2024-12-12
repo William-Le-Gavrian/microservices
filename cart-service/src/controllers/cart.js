@@ -1,34 +1,47 @@
 const CartModel = require('../models/Cart');
 const axios = require('axios');
+const mongoose = require('mongoose');
 
 module.exports = {
-    createCart: async (req, res) => {
-        try {
-            // const userId = req.user.id;
-            const cart = await CartModel.findOneAndUpdate(
-                // { userId },
-                { items: [] }, // Création d'un panier vide
-                { upsert: true, new: true } // Crée le panier si inexistant
-            );
-            res.status(200).send({ cart });
-        } catch (error) {
-            res.status(500).send({ error: error.message });
-        }
-    },
+    // createCart: async (req, res) => {
+    //     try {
+    //         // const userId = req.user.id;
+    //         const cart = await CartModel.findOneAndUpdate(
+    //             // { userId },
+    //             { items: [] }, // Création d'un panier vide
+    //             { upsert: true, new: true } // Crée le panier si inexistant
+    //         );
+    //         res.status(200).send({ cart });
+    //     } catch (error) {
+    //         res.status(500).send({ error: error.message });
+    //     }
+    // },
 
     getCart: async (req, res) => {
-        try{
-            // const userId = req.user.id;
-            // const cart = await CartModel.findOne({ userId });
-            const cart = await CartModel.find();
+        try {
+            console.log('Chargement du panier ...');
 
-            if(!cart){
-                return res.status(404).send({message: 'Cart not found'});
+            // Si l'utilisateur est authentifié, on peut continuer
+            const userId = req.user.userId;
+
+            // Récupérer le panier de l'utilisateur via l'ID
+            let cart = await CartModel.findOne({ userId });
+
+            if (!cart) {
+                // Si le panier n'existe pas encore, créer un panier vide
+                cart = new CartModel({
+                    userId: userId,
+                    items: [] // Le panier est vide au départ
+                });
             }
-            res.status(200).send({cart});
 
-        } catch(error){
-            res.status(500).send({error: error.message});
+            res.status(200).send({
+                message: 'Voici votre panier :',
+                cart
+            });
+            console.log('Accès au panier validé !', cart.items);
+        } catch (error) {
+            res.status(500).send({ message: error.message });
         }
     },
 
@@ -36,73 +49,112 @@ module.exports = {
         try {
             const { productId } = req.params;
             const { quantity } = req.body;
-
-            console.log(productId);
+            const userId = req.user.userId;
 
             if (!productId) {
-                return res.status(400).send({ message: "Invalid or missing productId" });
+                return res.status(400).send({ message: "Attention, le produit n'existe pas" });
             }
 
             if (quantity < 1) {
-                return res.status(400).send({ message: "Quantity is required and must be at least 1" });
+                return res.status(400).send({ message: 'Quantité requis doit être au dessus de 1' });
             }
+
+            console.log('Ajout du produit au panier ...');
 
             const productResponse = await axios.get(`http://localhost:3001/api/products/${productId}`);
             const product = productResponse.data;
 
-            console.log(product);
-
             if (!product || product.stock < quantity) {
-                return res.status(400).send({ message: "Product not available in requested quantity" });
+                return res.status(400).send({ message: 'Product not available in requested quantity' });
             }
 
-            let cart = await CartModel.findOne();
+            console.log('userId:', userId);
 
-            if(!cart) {
-                cart = new CartModel({items: []})
+            let cart = await CartModel.findOne({ userId });
+
+            if (!cart) {
+                cart = new CartModel({ userId: userId, items: [] });
             }
 
-            const existingItem = cart.items.find(item => item.productId.toString() === productId);
+            console.log('Cart:', cart);
+            console.log('userId:', userId);
 
-            if(existingItem) {
+            const existingItem = cart.items.find((item) => item.productId.toString() === productId);
+
+            if (existingItem) {
                 existingItem.quantity += quantity;
             } else {
                 cart.items.push({
                     productId,
                     name: product.product.name,
                     price: product.product.price,
-                    quantity,
+                    quantity
                 });
             }
 
             await cart.save();
 
-            res.status(200).send({ message: "Product added top cart", cart });
+            res.status(200).send({
+                message: 'Produit ajouté au panier avec succès.',
+                cart
+            });
+
+            console.log('Produit en cours ajouté : ', product);
         } catch (error) {
-            res.status(500).send({ error: error.message });
+            res.status(500).send({
+                message: 'Erreur lors de l\'ajout du produit au panier',
+                error: error.message
+            });
         }
     },
 
     removeItemFromCart: async (req, res) => {
-        try{
-            // const userId = req.params.id;
-            const {productId} = req.params;
+        try {
+            const { productId } = req.params;
 
-            const cart = await CartModel.findOneAndUpdate( // changer par findByIdAndUpdate
-                // { userId },
-                {},
-                { $pull: { items: { productId } } },
-                { new: true }
-            );
-
-            if(!cart) {
-                return res.status(404).send({message: 'Cart not found'});
+            if (!productId) {
+                return res.status(400).send({ message: "Le produit n'existe pas" });
             }
 
-            res.status(200).send({message: 'Product removed successfully.', cart});
+            const userId = req.user.userId;
 
-        } catch (error){
-            res.status(500).send({error: error.message});
+            // Convertir le productId de chaîne de caractères en ObjectId
+            const productObjectId = new mongoose.Types.ObjectId(productId);
+
+            // Trouver le panier de l'utilisateur
+            let cart = await CartModel.findOne({ userId });
+
+            if (!cart) {
+                return res.status(404).send({ message: 'Panier introuvable' });
+            }
+
+            // Vérifier si le produit est présent dans le panier
+            const productIndex = cart.items.findIndex((item) => {
+                return item.productId.toString() === productObjectId.toString(); // Comparaison correcte
+            });
+
+            cart.items.splice(productIndex, 1);
+
+            console.log(productIndex);
+
+            if (productIndex === -1) {
+                return res.status(404).send({ message: 'Produit introuvable dans le panier' });
+            }
+
+            await cart.save();
+
+            console.log('Retrait du produit ...');
+
+            res.status(200).send({
+                message: 'Produit retiré du panier avec succès.',
+                cart
+            });
+            console.log('Produit retiré du panier avec succès.');
+        } catch (error) {
+            res.status(500).send({
+                message: 'Erreur lors du retrait du produit du panier',
+                error: error.message
+            });
         }
     }
-}
+};

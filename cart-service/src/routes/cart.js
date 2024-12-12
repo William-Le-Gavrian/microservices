@@ -1,5 +1,6 @@
-const router = require("express").Router();
-const cartController = require("../controllers/cart");
+const router = require('express').Router();
+const cartController = require('../controllers/cart');
+const { verifyToken } = require('../middleware/jwt');
 
 /**
  * @swagger
@@ -21,7 +22,7 @@ const cartController = require("../controllers/cart");
  *          500:
  *              description: Server error
  */
-router.get("/", cartController.getCart);
+router.get("/", verifyToken, cartController.getCart);
 
 /**
  * @swagger
@@ -43,7 +44,7 @@ router.get("/", cartController.getCart);
  *       500:
  *         description: server error
  */
-router.post("/:productId", cartController.addItemToCart);
+router.post("/:productId", verifyToken, cartController.addItemToCart);
 
 /**
  * @swagger
@@ -65,6 +66,6 @@ router.post("/:productId", cartController.addItemToCart);
  *       500:
  *         description: Server error
  */
-router.delete("/:productId", cartController.removeItemFromCart);
+router.delete("/:productId", verifyToken, cartController.removeItemFromCart);
 
 module.exports = router;

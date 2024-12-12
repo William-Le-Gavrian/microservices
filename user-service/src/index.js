@@ -1,5 +1,6 @@
 const express = require('express');
 const connectDB = require('../config/configdb'); // Connexion à MongoDB
+const jwt = require('jsonwebtoken');
 const authRouter = require('./routes/auth'); // Routeur pour l'authentification
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');

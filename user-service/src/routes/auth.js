@@ -107,6 +107,8 @@ router.post('/login', authController.login);
  */
 router.put('/users/me', verifyToken, authController.updateUserDetails);
 
+router.get('/verify', authController.verifyUserToken);
+
 /**
  * @swagger
  * /api/auth/users/me:

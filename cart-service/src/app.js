@@ -8,7 +8,13 @@ const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUI = require('swagger-ui-express');
 
 // Autorise l'accès exterieur au serveur
-app.use(cors());
+app.use(
+    cors({
+        origin: '*',
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+    })
+);
 
 //Parse des requetes en JSON
 app.use(express.json());
@@ -41,10 +47,6 @@ mongoose
     .catch((error) => {
         console.error('Unable to connect database: ', error);
     });
-
-app.get('/', (req, res) => {
-    res.send('Bonjour nous sommes dans le panier');
-});
 
 app.use('/api/cart', apiRouter);
 

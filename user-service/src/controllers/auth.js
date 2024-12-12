@@ -2,6 +2,33 @@ const User = require('../models/User'); // Importer le modèle User
 const bcrypt = require('bcryptjs'); // Pour le hashage des mots de passe
 const jwt = require('jsonwebtoken'); // Pour générer les tokens
 
+const verifyUserToken = async (req, res) => {
+    try {
+        const token = req.headers['authorization']?.split(' ')[1]; // Extraire le token JWT
+        if (!token) {
+            return res.status(401).send({ message: 'Token manquant' });
+        }
+
+        console.log('Vérification du token ...');
+
+        const secret = process.env.JWT_SECRET || 'secret_key'; // Utilisation de la même clé secrète
+
+        // Vérifier et décoder le token avec la clé secrète
+        const decoded = jwt.verify(token, secret);
+
+        // Vérifier si l'utilisateur existe
+        const user = await User.findById(decoded._id);
+        if (!user) {
+            return res.status(401).send({ message: 'Utilisateur non trouvé ou token invalide' });
+        }
+
+        // Renvoie les informations utilisateur (par exemple, l'ID de l'utilisateur)
+        res.status(200).send({ userId: user._id });
+    } catch (error) {
+        return res.status(500).send({ message: 'Erreur interne du serveur', error: error.message });
+    }
+};
+
 // Fonction pour enregistrer un nouvel utilisateur
 const register = async (req, res) => {
     try {
@@ -35,6 +62,7 @@ const register = async (req, res) => {
 // Fonction pour connecter un utilisateur
 const login = async (req, res) => {
     try {
+        console.log('Requête reçue dans le login ...');
         const { email, password } = req.body;
 
         // Vérifier que les champs requis sont fournis
@@ -55,22 +83,19 @@ const login = async (req, res) => {
         }
 
         const userData = {
+            _id: user._id,
             email: user.email
         };
 
-        // Générer un token JWT
-        // const token = jwt.sign(
-        //     { id: user._id, email: user.email }, // Payload
-        //     'secret_key', // Clé secrète (remplacez par une clé plus sécurisée, idéalement dans .env)
-        //     { expiresIn: '2h' } // Le token expire après 1 heure
-        // );
-
         const secret = process.env.JWT_SECRET || 'secret';
+
         const jwtData = {
             expiresIn: process.env.JWT_TIMEOUT_DURATION || '1h'
         };
 
         const token = jwt.sign(userData, secret, jwtData);
+
+        console.log('Connexion réussie !');
 
         // Répondre avec succès
         res.status(200).json({
@@ -112,10 +137,11 @@ const updateUserDetails = async (req, res) => {
     }
 };
 
-// Exporter les fonctions
 // Fonction pour récupérer les informations de l'utilisateur connecté
 const getUserDetails = async (req, res) => {
     try {
+        console.log('Chargement pour les détails du profil ...');
+
         const userId = req.user.id; // Récupère l'ID utilisateur depuis le middleware JWT
 
         // Recherche de l'utilisateur dans la base de données
@@ -124,6 +150,8 @@ const getUserDetails = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'Utilisateur non trouvé.' });
         }
+
+        console.log('Informations récupérées avec succès !');
 
         // Réponse avec les données utilisateur
         res.status(200).json({
@@ -172,4 +200,4 @@ const changePassword = async (req, res) => {
     }
 };
 
-module.exports = { register, login, updateUserDetails, getUserDetails, changePassword };
+module.exports = { verifyUserToken, register, login, updateUserDetails, getUserDetails, changePassword };

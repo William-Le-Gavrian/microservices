@@ -1,37 +1,40 @@
-const ProductModel = require("../models/Product");
-const {verifyProduct} = require("../validator/product");
-
+const ProductModel = require('../models/Product');
+const { verifyProduct } = require('../validator/product');
 
 module.exports = {
     createProduct: async (req, res) => {
         try {
             const isNotValid = verifyProduct(req.body);
-            if(isNotValid) {
-                res.status(400).send({error: isNotValid.message});
+            if (isNotValid) {
+                res.status(400).send({ error: isNotValid.message });
             }
 
             const newProduct = new ProductModel(req.body);
 
             await newProduct.save();
 
-            return res.status(200).send({message: 'Product created', product: newProduct});
-
-        } catch(error){
-            res.status(500).send({error: error.message});
+            return res.status(200).send({
+                message: 'Produits créés avec succès',
+                product: newProduct
+            });
+        } catch (error) {
+            res.status(500).send({ error: error.message });
         }
     },
 
-    getAllProducts: async (req, res) =>{
+    getAllProducts: async (req, res) => {
         try {
             const products = await ProductModel.find();
-
-            if(!products){
+          if(!products){
                 res.status(404).send({message: 'Products not found'});
             }
-
-            res.status(200).send({products: products});
-        } catch(error){
-            res.status(500).send({error: error.message || 'Cannot get all products'});
+          
+            res.status(201).send({
+                message: 'Bienvenue sur la page des produits',
+                products: products
+            });
+        } catch (error) {
+            res.status(500).send({ error: error.message || 'Cannot get all products' });
         }
     },
 
@@ -40,12 +43,15 @@ module.exports = {
 
         try {
             const product = await ProductModel.findById(productId);
-
-            if(!product){
+          
+          if(!product){
                 res.status(404).send({message: 'Product not found'});
             }
-
-            res.status(200).send({product: product});
+          
+            res.status(200).send({
+                message: 'Produit trouvé avec succès',
+                product: product
+            });
         } catch (error) {
             res.status(500).send({
                 message: `Error retrieving product with id=${productId}`
@@ -54,44 +60,43 @@ module.exports = {
     },
 
     updateProduct: async (req, res) => {
-
-        try{
+        try {
             const isNotValid = verifyProduct(req.body);
-            if(isNotValid) {
-                res.status(400).send({error: isNotValid.message});
+            if (isNotValid) {
+                res.status(400).send({ error: isNotValid.message });
             }
 
             const productId = req.params.id;
 
-            const updatedProduct = await ProductModel.findByIdAndUpdate(productId, req.body, {new: true});
+            const updatedProduct = await ProductModel.findByIdAndUpdate(productId, req.body, { new: true });
 
-            if(!updatedProduct) {
+            if (!updatedProduct) {
                 return res.status(404).send({
                     message: `Product with id=${productId} not found.`
                 });
             }
-
             res.status(200).send({
-                message: 'Product was updated successfully.',
-                product: updatedProduct
+                message: 'Mise à jour du produit réussie',
+                resume: updatedProduct
             });
-        } catch(error){
-            res.status(500).send({error: error.message || `Error updating product with id=${req.params.id}`});
+        } catch (error) {
+            res.status(500).send({ error: error.message || `Error updating product with id=${req.params.id}` });
         }
     },
 
     deleteProduct: async (req, res) => {
-        try{
+        try {
             const productId = req.params.id;
             const product = await ProductModel.findByIdAndDelete(productId);
-            if(!product) {
-                return res.status(404).send(`No record with given id: ${productId}`)
+            if (!product) {
+                return res.status(404).send(`No record with given id: ${productId}`);
             }
 
-            res.status(204).send({message: 'Product deleted successfully.'});
-
-        } catch(error){
-            res.status(500).send({error: error.message});
+            res.status(204).send({
+                message: 'Produit supprimé avec succès'
+            });
+        } catch (error) {
+            res.status(500).send({ error: error.message });
         }
     }
-}
+};
