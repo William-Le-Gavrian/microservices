@@ -6,7 +6,13 @@ const apiRouter = require('./routes/cart');
 const cors = require('cors');
 
 // Autorise l'accès exterieur au serveur
-app.use(cors());
+app.use(
+    cors({
+        origin: '*',
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization'],
+    })
+);
 
 //Parse des requetes en JSON
 app.use(express.json());

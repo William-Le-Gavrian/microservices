@@ -35,11 +35,11 @@ module.exports = {
                 });
             }
 
-            console.log('Accès au panier validé !', cart);
             res.status(200).send({
                 message: 'Voici votre panier :',
                 cart
             });
+            console.log('Accès au panier validé !', cart.items);
         } catch (error) {
             res.status(500).send({ message: error.message });
         }
@@ -101,7 +101,10 @@ module.exports = {
 
             console.log('Produit en cours ajouté : ', product);
         } catch (error) {
-            res.status(500).send({ error: error.message });
+            res.status(500).send({
+                message: 'Erreur lors de l\'ajout du produit au panier',
+                error: error.message
+            });
         }
     },
 
@@ -149,6 +152,7 @@ module.exports = {
             console.log('Produit retiré du panier avec succès.');
         } catch (error) {
             res.status(500).send({
+                message: 'Erreur lors du retrait du produit du panier',
                 error: error.message
             });
         }

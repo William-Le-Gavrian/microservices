@@ -88,7 +88,6 @@ const login = async (req, res) => {
         };
 
         const secret = process.env.JWT_SECRET || 'secret';
-        console.log('secret', secret);
 
         const jwtData = {
             expiresIn: process.env.JWT_TIMEOUT_DURATION || '1h'
