@@ -2,6 +2,8 @@ const router = require('express').Router();
 const authController = require('../controllers/auth');
 const { verifyToken } = require('../middleware/jwt');
 
+router.get('/verify', authController.verifyUserToken);
+
 /**
  * @swagger
  * tags:
@@ -106,8 +108,6 @@ router.post('/login', authController.login);
  *         description: Server error
  */
 router.put('/users/me', verifyToken, authController.updateUserDetails);
-
-router.get('/verify', authController.verifyUserToken);
 
 /**
  * @swagger

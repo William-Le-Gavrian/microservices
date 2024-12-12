@@ -21,7 +21,7 @@ app.use('/auth', async (req, res, next) => {
         console.log("Requête reçue dans l'API Gateway pour", req.url);
 
         // On ne passe pas les en-têtes pour login et register
-        let headersToSend = {};
+        let headersToSend = { 'Content-Type': 'application/json' };
 
         // Si la route est '/login' ou '/register', on n'envoie pas les en-têtes
         if (req.url !== '/login' && req.url !== '/register') {
@@ -32,26 +32,22 @@ app.use('/auth', async (req, res, next) => {
             headersToSend['Authorization'] = req.headers['authorization']; // Assurez-vous que l'Authorization est transmis
         }
 
-        console.log('En-têtes envoyés:', headersToSend);
-
         let bodyToSend = req.method === 'GET' ? undefined : req.body;
 
         // Log avant l'appel vers le microservice
         console.log('Fait appel au microservice:', userServiceUrl);
-        console.log('Body:', bodyToSend);
 
         // Faire la requête vers le microservice
-        const response = await axios({
+        const response = await fetch(userServiceUrl, {
             method: req.method, // Utilise la même méthode HTTP que la requête d'origine
-            url: userServiceUrl, // Redirige vers l'URL du microservice
-            data: bodyToSend, // Envoie le corps de la requête s'il y en a un
-            headers: headersToSend // Passe les en-têtes si nécessaire
+            headers: headersToSend, // Passe les en-têtes si nécessaire
+            body: bodyToSend ? JSON.stringify(bodyToSend) : undefined // Envoie le corps de la requête si nécessaire
         });
 
-        // console.log('Réponse reçue du microservice:', response.status, response.data);
+        const data = await response.json();
 
-        // Répondre avec la réponse du microservice
-        res.status(response.status).json(response.data);
+        res.status(response.status).json(data);
+
         console.log('Réponse envoyée au client');
     } catch (error) {
         console.error("Erreur lors de l'appel au microservice user-service:", error);
@@ -96,7 +92,6 @@ app.use('/products', async (req, res, next) => {
         console.log('Réponse envoyée au client');
     } catch (error) {
         console.error("Erreur lors de l'appel au microservice user-service:", error);
-        console.log("Requête reçue dans l'API Gateway pour", req.url);
         res.status(500).json({
             message: 'Erreur serveur',
             error: error.response ? error.response.data : error.message
@@ -125,8 +120,6 @@ app.use('/cart', async (req, res, next) => {
         };
 
         console.log('Fait appel au microservice:', userServiceUrl);
-        console.log('Body:', bodyToSend);
-        console.log('Headers:', headers);
 
         // // Faire la requête vers le microservice
         // const response = await axios({
@@ -138,9 +131,9 @@ app.use('/cart', async (req, res, next) => {
         // });
 
         const response = await fetch(userServiceUrl, {
-            method: req.method,        // Utilise la méthode de la requête
-            headers: headers,           // En-têtes de la requête
-            body: req.method === 'POST' || req.method === 'PUT' ? JSON.stringify(bodyToSend) : undefined,  // Si c'est une requête POST ou PUT, ajoute le body
+            method: req.method, // Utilise la méthode de la requête
+            headers: headers, // En-têtes de la requête
+            body: req.method === 'POST' || req.method === 'PUT' ? JSON.stringify(bodyToSend) : undefined // Si c'est une requête POST ou PUT, ajoute le body
         });
 
         console.log('URL cible pour le microservice :', userServiceUrl);
@@ -152,7 +145,7 @@ app.use('/cart', async (req, res, next) => {
         //     console.error('Aucune réponse valide reçue du microservice');
         // }
 
-        const data = await response.json();  // Attendre la réponse du microservice
+        const data = await response.json(); // Attendre la réponse du microservice
 
         // Répondre avec la réponse du microservice
         res.status(response.status).json(data);

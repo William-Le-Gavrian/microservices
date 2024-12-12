@@ -33,7 +33,7 @@ const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/user-api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.get('/', (req, res) => {
-  res.send('Hello World');
+  res.send('Bonjour vous pouvez connecter "/login" ou vous inscrire "/register"');
 });
 
 app.use('/api/auth', authRouter);

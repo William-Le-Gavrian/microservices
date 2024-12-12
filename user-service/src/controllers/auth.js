@@ -19,29 +19,43 @@ const verifyUserToken = async (req, res) => {
         // Vérifier si l'utilisateur existe
         const user = await User.findById(decoded._id);
         if (!user) {
-            return res.status(401).send({ message: 'Utilisateur non trouvé ou token invalide' });
+            return res.status(401).send({
+                message: 'Utilisateur non trouvé ou token invalide'
+            });
         }
 
         // Renvoie les informations utilisateur (par exemple, l'ID de l'utilisateur)
-        res.status(200).send({ userId: user._id });
+        res.status(200).send({
+            userId: user._id
+        });
+
+        console.log('Token vérifié avec succès !');
     } catch (error) {
-        return res.status(500).send({ message: 'Erreur interne du serveur', error: error.message });
+        console.error('Erreur lors du verifyUserToken:', error.message);
+        return res.status(500).send({
+            message: 'Erreur lors du verifyUserToken',
+            error: error.message
+        });
     }
 };
 
 // Fonction pour enregistrer un nouvel utilisateur
 const register = async (req, res) => {
     try {
+        console.log("Chargement de l'inscription ...");
+
         const { firstname, lastname, email, password } = req.body;
 
         // Vérifier que les champs requis sont fournis
         if (!firstname || !lastname || !email || !password) {
+            console.log('Tous les champs sont requis.');
             return res.status(400).json({ message: 'Tous les champs sont requis.' });
         }
 
         // Vérifier si l'email existe déjà
         const existingUser = await User.findOne({ email });
         if (existingUser) {
+            console.log('Cet email est déjà utilisé.');
             return res.status(400).json({ message: 'Cet email est déjà utilisé.' });
         }
 
@@ -53,32 +67,45 @@ const register = async (req, res) => {
         await newUser.save();
 
         // Répondre avec succès
-        res.status(201).json({ message: 'Utilisateur créé avec succès', user: { firstname, lastname, email } });
+        res.status(201).json({
+            message: 'Utilisateur créé avec succès',
+            user: { firstname, lastname, email }
+        });
+
+        console.log('Utilisateur créé avec succès !');
     } catch (error) {
-        res.status(500).json({ message: 'Erreur serveur', error: error.message });
+        console.log("Erreur lors de l'inscription :", error.message);
+        res.status(500).json({
+            message: "Erreur lors de l'inscription",
+            error: error.message
+        });
     }
 };
 
 // Fonction pour connecter un utilisateur
 const login = async (req, res) => {
     try {
-        console.log('Requête reçue dans le login ...');
+        console.log('Chargement de la connexion ...');
+
         const { email, password } = req.body;
 
         // Vérifier que les champs requis sont fournis
         if (!email || !password) {
+            console.log('Les champs email et password sont requis.');
             return res.status(400).json({ message: 'Les champs email et password sont requis.' });
         }
 
         // Vérifier si l'utilisateur existe
         const user = await User.findOne({ email });
         if (!user) {
+            console.log('Utilisateur non trouvé.');
             return res.status(404).json({ message: 'Utilisateur non trouvé.' });
         }
 
         // Vérifier si le mot de passe est correct
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
+            console.log('Mot de passe incorrect.');
             return res.status(401).json({ message: 'Mot de passe incorrect.' });
         }
 
@@ -95,26 +122,32 @@ const login = async (req, res) => {
 
         const token = jwt.sign(userData, secret, jwtData);
 
-        console.log('Connexion réussie !');
-
         // Répondre avec succès
         res.status(200).json({
             message: 'Connexion réussie',
-            token, // Inclure le token dans la réponse
+            token,
             user: { email: user.email }
         });
+
+        console.log('Connexion réussie !');
     } catch (error) {
-        res.status(500).json({ message: 'Erreur serveur', error: error.message });
+        console.log('Erreur de connexion :', error.message);
+        res.status(500).json({
+            message: 'Erreur serveur',
+            error: error.message
+        });
     }
 };
 
 // Fonction pour mettre à jour les informations utilisateur
 const updateUserDetails = async (req, res) => {
     try {
+        console.log('Chargement pour la mise à jour des informations utilisateur ...');
         const userId = req.user.id; // ID de l'utilisateur extrait du middleware JWT
         const { firstname, lastname, email } = req.body;
 
         if (!firstname && !lastname && !email) {
+            console.log('Aucune donnée fournie pour la mise à jour.');
             return res.status(400).json({ message: 'Aucune donnée fournie pour la mise à jour.' });
         }
 
@@ -125,6 +158,7 @@ const updateUserDetails = async (req, res) => {
         ).select('firstname lastname email');
 
         if (!updatedUser) {
+            console.log('Utilisateur non trouvé.');
             return res.status(404).json({ message: 'Utilisateur non trouvé.' });
         }
 
@@ -132,8 +166,14 @@ const updateUserDetails = async (req, res) => {
             message: 'Informations mises à jour avec succès.',
             user: updatedUser
         });
+
+        console.log('Informations mises à jour avec succès !');
     } catch (error) {
-        res.status(500).json({ message: 'Erreur serveur', error: error.message });
+        console.log('Erreur lors de la mise à jour des informations utilisateur :', error.message);
+        res.status(500).json({
+            message: 'Erreur lors de la mise à jour des informations utilisateur',
+            error: error.message
+        });
     }
 };
 
@@ -148,22 +188,26 @@ const getUserDetails = async (req, res) => {
         const user = await User.findById(userId).select('firstname lastname email'); // Exclure les données sensibles comme le mot de passe
 
         if (!user) {
+            console.log('Utilisateur non trouvé.');
             return res.status(404).json({ message: 'Utilisateur non trouvé.' });
         }
-
-        console.log('Informations récupérées avec succès !');
 
         // Réponse avec les données utilisateur
         res.status(200).json({
             message: 'Données utilisateur récupérées avec succès.',
             user
         });
+
+        console.log('Informations récupérées avec succès !');
     } catch (error) {
-        res.status(500).json({ message: 'Erreur serveur', error: error.message });
+        console.log('Erreur lors de la récupération des informations utilisateur :', error.message);
+        res.status(500).json({
+            message: 'Erreur lors de la récupération des informations utilisateur :',
+            error: error.message
+        });
     }
 };
 
-// Exporter la fonction
 // Fonction pour changer le mot de passe d'un utilisateur
 const changePassword = async (req, res) => {
     try {
@@ -172,18 +216,21 @@ const changePassword = async (req, res) => {
 
         // Vérifie que les champs sont fournis
         if (!oldPassword || !newPassword) {
+            console.log('Les champs oldPassword et newPassword sont requis.');
             return res.status(400).json({ message: 'Les champs oldPassword et newPassword sont requis.' });
         }
 
         // Recherche de l'utilisateur dans la base de données
         const user = await User.findById(userId);
         if (!user) {
+            console.log('Utilisateur non trouvé.');
             return res.status(404).json({ message: 'Utilisateur non trouvé.' });
         }
 
         // Vérifie que l'ancien mot de passe est correct
         const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
         if (!isPasswordValid) {
+            console.log('Ancien mot de passe incorrect.');
             return res.status(400).json({ message: 'Ancien mot de passe incorrect.' });
         }
 
@@ -194,9 +241,17 @@ const changePassword = async (req, res) => {
         // Sauvegarde du mot de passe mis à jour
         await user.save();
 
-        res.status(200).json({ message: 'Mot de passe mis à jour avec succès.' });
+        res.status(200).json({
+            message: 'Mot de passe mis à jour avec succès.'
+        });
+
+        console.log('Mot de passe mis à jour avec succès !');
     } catch (error) {
-        res.status(500).json({ message: 'Erreur serveur', error: error.message });
+        console.log('Erreur lors de la mise à jour du mot de passe :', error.message);
+        res.status(500).json({
+            message: 'Erreur lors de la mise à jour du mot de passe :',
+            error: error.message
+        });
     }
 };
 
