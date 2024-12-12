@@ -25,6 +25,10 @@ module.exports = {
     getAllProducts: async (req, res) => {
         try {
             const products = await ProductModel.find();
+          if(!products){
+                res.status(404).send({message: 'Products not found'});
+            }
+          
             res.status(201).send({
                 message: 'Bienvenue sur la page des produits',
                 products: products
@@ -39,14 +43,18 @@ module.exports = {
 
         try {
             const product = await ProductModel.findById(productId);
+          
+          if(!product){
+                res.status(404).send({message: 'Product not found'});
+            }
+          
             res.status(200).send({
                 message: 'Produit trouvé avec succès',
                 product: product
             });
         } catch (error) {
-            console.log(error);
             res.status(500).send({
-                message: `Error retrieving resume with id=${productId}`
+                message: `Error retrieving product with id=${productId}`
             });
         }
     },
@@ -64,11 +72,10 @@ module.exports = {
 
             if (!updatedProduct) {
                 return res.status(404).send({
-                    message: `Resume with id=${productId} not found.`
+                    message: `Product with id=${productId} not found.`
                 });
             }
-
-            res.send({
+            res.status(200).send({
                 message: 'Mise à jour du produit réussie',
                 resume: updatedProduct
             });
