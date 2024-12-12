@@ -24,7 +24,12 @@ module.exports = {
     getAllProducts: async (req, res) =>{
         try {
             const products = await ProductModel.find();
-            res.status(201).send({products: products});
+
+            if(!products){
+                res.status(404).send({message: 'Products not found'});
+            }
+
+            res.status(200).send({products: products});
         } catch(error){
             res.status(500).send({error: error.message || 'Cannot get all products'});
         }
@@ -35,11 +40,15 @@ module.exports = {
 
         try {
             const product = await ProductModel.findById(productId);
+
+            if(!product){
+                res.status(404).send({message: 'Product not found'});
+            }
+
             res.status(200).send({product: product});
         } catch (error) {
-            console.log(error);
             res.status(500).send({
-                message: `Error retrieving resume with id=${productId}`
+                message: `Error retrieving product with id=${productId}`
             });
         }
     },
@@ -58,13 +67,13 @@ module.exports = {
 
             if(!updatedProduct) {
                 return res.status(404).send({
-                    message: `Resume with id=${productId} not found.`
+                    message: `Product with id=${productId} not found.`
                 });
             }
 
-            res.send({
-                message: 'Resume was updated successfully.',
-                resume: updatedProduct
+            res.status(200).send({
+                message: 'Product was updated successfully.',
+                product: updatedProduct
             });
         } catch(error){
             res.status(500).send({error: error.message || `Error updating product with id=${req.params.id}`});
