@@ -1,10 +1,8 @@
-const express = require('express');
-
-// Va permettre de rediriger les requêtes vers les bons microservices
-const { createProxyMiddleware } = require('http-proxy-middleware');
+import express from 'express';
+import fetch from 'node-fetch';
 
 // Envoi des requêtes HTTP
-const axios = require('axios');
+import axios from 'axios';
 
 const app = express();
 
@@ -130,13 +128,19 @@ app.use('/cart', async (req, res, next) => {
         console.log('Body:', bodyToSend);
         console.log('Headers:', headers);
 
-        // Faire la requête vers le microservice
-        const response = await axios({
-            method: req.method,
-            url: userServiceUrl,
-            data: bodyToSend,
-            headers: headers,
-            timeout: 10000
+        // // Faire la requête vers le microservice
+        // const response = await axios({
+        //     method: req.method,
+        //     url: userServiceUrl,
+        //     data: bodyToSend,
+        //     headers: headers,
+        //     timeout: 10000
+        // });
+
+        const response = await fetch(userServiceUrl, {
+            method: req.method,        // Utilise la méthode de la requête
+            headers: headers,           // En-têtes de la requête
+            body: req.method === 'POST' || req.method === 'PUT' ? JSON.stringify(bodyToSend) : undefined,  // Si c'est une requête POST ou PUT, ajoute le body
         });
 
         console.log('URL cible pour le microservice :', userServiceUrl);
@@ -144,12 +148,17 @@ app.use('/cart', async (req, res, next) => {
 
         console.log('Réponse reçue du microservice:', response.status, response.data);
 
-        if (!response || !response.data) {
-            console.error('Aucune réponse valide reçue du microservice');
-        }
+        // if (!response || !response.data) {
+        //     console.error('Aucune réponse valide reçue du microservice');
+        // }
+
+        const data = await response.json();  // Attendre la réponse du microservice
 
         // Répondre avec la réponse du microservice
-        res.status(response.status).json(response.data);
+        res.status(response.status).json(data);
+
+        // Répondre avec la réponse du microservice
+        // res.status(response.status).json(response.data);
         console.log('Réponse envoyée au client');
     } catch (error) {
         console.error("Erreur lors de l'appel au microservice user-service:", error.message);

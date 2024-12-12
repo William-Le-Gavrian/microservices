@@ -14,7 +14,9 @@
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "http-proxy-middleware": "^3.0.3",
-    "jsonwebtoken": "^9.0.2"
+    "jsonwebtoken": "^9.0.2",
+    "node-fetch": "^3.3.2"
   },
-  "description": ""
+  "description": "",
+  "type": "module"
 }
