@@ -3,6 +3,13 @@ const cartController = require("../controllers/cart");
 
 /**
  * @swagger
+ * tags:
+ *   name: Cart
+ *   description: Cart management
+ */
+
+/**
+ * @swagger
  * /api/cart:
  *  get:
  *      description: Returns the content of the cart

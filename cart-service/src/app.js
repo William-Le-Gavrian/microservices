@@ -49,5 +49,6 @@ app.get('/', (req, res) => {
 app.use('/api/cart', apiRouter);
 
 app.listen(3002, () => {
-    console.log('Server is running on port 3002');
+    console.log('Server is running on port http://localhost:3002');
+    console.log(`Doc for Cart Service : http://localhost:3002/cart-api-docs`);
 });

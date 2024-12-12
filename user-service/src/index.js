@@ -4,47 +4,41 @@ const authRouter = require('./routes/auth'); // Routeur pour l'authentification
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
 
-const app = express(); // Créer une instance d'application Express
-const port = 5000; // Définir le port d'écoute
+const app = express();
+const port = 5000;
 
-// Connexion à MongoDB
 connectDB();
 
-// Middleware pour analyser les données JSON
 app.use(express.json());
 
-// Configuration Swagger
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'API d\'authentification',
+      title: 'User Service API',
       version: '1.0.0',
-      description: 'API pour gérer l\'authentification des utilisateurs',
+      description: 'API documentation for the User Service',
     },
     servers: [
       {
         url: 'http://localhost:5000',
-        description: 'Serveur local',
       },
     ],
   },
-  apis: ['./routes/*.js'], // Chemin vers vos fichiers de routes (ajustez si nécessaire)
+  apis: ['./src/routes/*.js'],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+app.use('/user-api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// Page d'accueil
 app.get('/', (req, res) => {
-  res.send('Bonjour nous sommes dans la page d\'authentification');
+  res.send('Hello World');
 });
 
-// Routes pour l'authentification
 app.use('/api/auth', authRouter);
 
 // Démarrer le serveur
 app.listen(port, () => {
   console.log(`Serveur en cours d'exécution sur http://localhost:${port}`);
-  console.log(`Documentation disponible sur http://localhost:${port}/api-docs`);
+  console.log(`Documentation disponible sur http://localhost:${port}/user-api-docs`);
 });

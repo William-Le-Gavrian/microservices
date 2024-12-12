@@ -3,6 +3,13 @@ const productController = require("../controllers/product");
 
 /**
  * @swagger
+ * tags:
+ *   name: Product
+ *   description: Product management
+ */
+
+/**
+ * @swagger
  * /api/products:
  *   post:
  *     summary: Create a new product

@@ -6,14 +6,14 @@ const { verifyToken } = require('../middleware/jwt');
  * @swagger
  * tags:
  *   name: Auth
- *   description: Gestion de l'authentification et des utilisateurs.
+ *   description: Authentication and user management
  */
 
 /**
  * @swagger
  * /api/auth/register:
  *   post:
- *     summary: Inscription d'un nouvel utilisateur
+ *     summary: Registering a new User
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -33,11 +33,11 @@ const { verifyToken } = require('../middleware/jwt');
  *                 type: string
  *     responses:
  *       201:
- *         description: Utilisateur créé avec succès.
+ *         description: User created successfully
  *       400:
- *         description: Requête invalide (champs manquants ou email déjà utilisé).
+ *         description: Bad request (missing fields or email already used)
  *       500:
- *         description: Erreur serveur.
+ *         description: Server error
  */
 router.post('/register', authController.register);
 
@@ -45,7 +45,7 @@ router.post('/register', authController.register);
  * @swagger
  * /api/auth/login:
  *   post:
- *     summary: Connexion utilisateur
+ *     summary: User login
  *     tags: [Auth]
  *     requestBody:
  *       required: true
@@ -61,15 +61,15 @@ router.post('/register', authController.register);
  *                 type: string
  *     responses:
  *       200:
- *         description: Connexion réussie et token JWT retourné.
+ *         description: User logged in successfully
  *       400:
- *         description: Champs manquants.
+ *         description: Bad request (missing fields)
  *       401:
- *         description: Mot de passe incorrect.
+ *         description: Incorrect password
  *       404:
- *         description: Utilisateur non trouvé.
+ *         description: User not found
  *       500:
- *         description: Erreur serveur.
+ *         description: Server error
  */
 router.post('/login', authController.login);
 
@@ -77,7 +77,7 @@ router.post('/login', authController.login);
  * @swagger
  * /api/auth/users/me:
  *   put:
- *     summary: Mettre à jour les informations utilisateur
+ *     summary: Updates user information
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: []
@@ -97,13 +97,13 @@ router.post('/login', authController.login);
  *                 format: email
  *     responses:
  *       200:
- *         description: Informations mises à jour avec succès.
+ *         description: User information updated successfully
  *       400:
- *         description: Aucune donnée fournie pour la mise à jour.
+ *         description: Bad request (missing fields)
  *       404:
- *         description: Utilisateur non trouvé.
+ *         description: User not found
  *       500:
- *         description: Erreur serveur.
+ *         description: Server error
  */
 router.put('/users/me', verifyToken, authController.updateUserDetails);
 
@@ -111,17 +111,17 @@ router.put('/users/me', verifyToken, authController.updateUserDetails);
  * @swagger
  * /api/auth/users/me:
  *   get:
- *     summary: Récupérer les informations utilisateur
+ *     summary: Retrieves user information
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Données utilisateur récupérées avec succès.
+ *         description: User information retrieved successfully
  *       404:
- *         description: Utilisateur non trouvé.
+ *         description: User not found
  *       500:
- *         description: Erreur serveur.
+ *         description: Server error
  */
 router.get('/users/me', verifyToken, authController.getUserDetails);
 
@@ -129,7 +129,7 @@ router.get('/users/me', verifyToken, authController.getUserDetails);
  * @swagger
  * /api/auth/users/me/password:
  *   patch:
- *     summary: Changer le mot de passe de l'utilisateur
+ *     summary: Changes user password
  *     tags: [Auth]
  *     security:
  *       - bearerAuth: []
@@ -146,14 +146,14 @@ router.get('/users/me', verifyToken, authController.getUserDetails);
  *                 type: string
  *     responses:
  *       200:
- *         description: Mot de passe mis à jour avec succès.
+ *         description: Password updated successfully
  *       400:
- *         description: Champs manquants ou ancien mot de passe incorrect.
+ *         description: Bad request (missing fields)
  *       404:
- *         description: Utilisateur non trouvé.
+ *         description: User not found
  *       500:
- *         description: Erreur serveur.
+ *         description: Server error
  */
 router.patch('/users/me/password', verifyToken, authController.changePassword);
 
-module.exports = router; // Exporter correctement le routeur
+module.exports = router;

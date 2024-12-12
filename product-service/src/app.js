@@ -49,5 +49,6 @@ app.get('/', (req, res) => {
 app.use('/api/products', apiRouter);
 
 app.listen(3001, () => {
-    console.log('Server is running on port 3001');
+    console.log('Server is running on port http://localhost:3001');
+    console.log(`Doc for Product Service : http://localhost:3001/product-api-docs`);
 });
